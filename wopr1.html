@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Product - Stylemate (Premium)</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:"Poppins",sans-serif;background:linear-gradient(120deg,#f5f2ee,#efe6db);color:#111;min-height:100vh}
+    a { color:inherit; text-decoration:none }
+
+    #workingarea{width:90%;max-width:1200px;margin:24px auto}
+    #nav{display:flex;justify-content:space-between;align-items:center;padding:12px 0}
+    #nav img{height:60px}
+    #nav a{margin-left:12px;font-weight:600;text-transform:uppercase;font-size:13px;color:#222}
+
+    .product-section{display:flex;gap:36px;padding:28px 0;align-items:flex-start}
+
+    .left-side{
+      flex:1;
+      display:flex;
+      gap:16px;
+      align-items:flex-start;
+    }
+
+    .thumbs{
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+
+    .thumbs img{
+      width:88px;
+      height:110px;
+      border-radius:12px;
+      object-fit:cover;
+      cursor:pointer;
+      border:2px solid #eee;
+      transition:transform .25s;
+    }
+    .thumbs img:hover{transform:scale(1.04)}
+
+    .main-img{
+      position:relative;
+      overflow:hidden;
+    }
+    .main-img img{
+      width:420px;
+      height:520px;
+      border-radius:14px;
+      object-fit:cover;
+      box-shadow:0 10px 25px rgba(0,0,0,.08);
+      cursor:zoom-in;
+      transition:transform .35s ease;
+    }
+    .main-img:hover img{
+      transform:scale(1.35);
+    }
+
+    .right-side{flex:0 0 420px}
+    .right-side h1{font-size:26px;margin-bottom:6px}
+    .subtitle{color:#666;margin-bottom:12px}
+    .price{font-size:24px;font-weight:700;margin-bottom:8px}
+    .old{color:#999;text-decoration:line-through;margin-left:10px}
+
+    .sizes{display:flex;gap:8px;margin:16px 0}
+    .sizes span{
+      padding:10px 14px;
+      border-radius:10px;
+      border:1px solid #ddd;
+      cursor:pointer;
+      font-weight:600;
+    }
+    .sizes span:hover{background:#111;color:#fff}
+
+    /* SELECTED SIZE */
+    .active-size{
+      background:#111 !important;
+      color:#fff !important;
+      border-color:#111 !important;
+    }
+
+    /* PINCODE */
+    .pinbox{margin-top:20px;}
+    .pinbox input{
+      padding:10px;
+      border:1px solid #aaa;
+      border-radius:8px;
+      width:150px;
+    }
+    .pinbox button{
+      padding:10px 14px;
+      background:#111;
+      color:#fff;
+      border:none;
+      border-radius:8px;
+      margin-left:6px;
+      cursor:pointer;
+      font-weight:600;
+    }
+    #pincodeResult{
+      margin-top:6px;
+      font-weight:600;
+      color:green;
+      display:none;
+    }
+
+    .btn{display:inline-block;padding:14px 18px;border-radius:12px;border:none;font-weight:700;cursor:pointer;}
+    .add-btn{background:#111;color:#fff;width:100%;font-size:16px;box-shadow:0 8px 20px rgba(17,17,17,.12)}
+    .wish{background:#fff;border:1px solid #111;margin-top:12px;color:#111;width:100%;padding:12px;border-radius:10px}
+
+    /* CART DRAWER */
+    .cart-overlay{
+      position:fixed;inset:0;background:rgba(0,0,0,.35);backdrop-filter:blur(4px);
+      opacity:0;visibility:hidden;transition:all .35s;z-index:9998;
+    }
+    .cart-overlay.show{opacity:1;visibility:visible}
+
+    .cart-drawer{
+      position:fixed;top:0;right:-520px;width:460px;height:100vh;
+      background:rgba(255,255,255,0.75);
+      box-shadow:-20px 40px 60px rgba(0,0,0,.12);
+      backdrop-filter:blur(10px);
+      padding:28px;
+      border-left:1px solid rgba(255,255,255,.3);
+      transition:all .45s cubic-bezier(.2,.9,.2,1);
+      z-index:9999;
+      display:flex;flex-direction:column;gap:14px;
+    }
+    .cart-drawer.open{right:0}
+
+    .drawer-header{display:flex;justify-content:space-between;align-items:center}
+    .drawer-items{flex:1;overflow:auto;padding-right:6px}
+    .drawer-item{display:flex;gap:12px;align-items:center;padding:12px;border-radius:12px;
+      background:rgba(255,255,255,.5);margin-bottom:12px;
+      box-shadow:0 6px 18px rgba(0,0,0,.04);}
+    .drawer-item img{width:78px;height:98px;border-radius:10px}
+
+    .qty-controls{display:flex;flex-direction:column;gap:8px;align-items:center}
+    .qbtn{padding:6px 10px;background:#111;color:#fff;border-radius:8px;border:0;cursor:pointer}
+
+    .drawer-footer{padding-top:8px;border-top:1px solid rgba(0,0,0,.06)}
+    .drawer-summary{display:flex;justify-content:space-between;font-weight:700;margin-bottom:8px}
+
+    .drawer-cta{display:flex;gap:10px}
+    .go-cart{flex:1;padding:12px;border-radius:10px;border:0;background:#111;color:#fff;font-weight:700}
+    .checkout-min{flex:0 0 140px;padding:12px;border-radius:10px;border:1px solid #111;background:transparent;font-weight:700}
+
+    .toast {
+      position:fixed;right:24px;bottom:24px;background:#111;color:#fff;
+      padding:12px 18px;border-radius:12px;box-shadow:0 10px 25px rgba(17,17,17,.2);
+      transform:translateY(30px);opacity:0;transition:all .32s;z-index:10001;
+    }
+    .toast.show{transform:translateY(0);opacity:1}
+
+  </style>
+</head>
+<body>
+
+<div id="workingarea">
+
+  <!-- NAV -->
+  <div id="nav">
+    <div id="nleft">
+      <img src="images/stylemate (4) (1).png" alt="logo">
+      <a href="men.html">man</a>
+      <a href="women.html">women</a>
+    </div>
+    <div id="nright">
+      <a href="login.html">login</a>
+      <a href="cart.html">cart</a>
+    </div>
+  </div>
+
+  <!-- PRODUCT SECTION -->
+  <section class="product-section">
+
+    <!-- LEFT SIDE -->
+    <div class="left-side">
+
+      <div class="thumbs">
+        <img src="products(img)/Gemini_Generated_Image_v47amgv47amgv47a.png" onclick="changeImg(this.src)">
+        <img src="products(img)/Gemini_Generated_Image_drryr3drryr3drry.png" onclick="changeImg(this.src)">
+        <img src="products(img)/Gemini_Generated_Image_3afeyq3afeyq3afe.png" onclick="changeImg(this.src)">
+        
+      </div>
+
+      <div class="main-img">
+        <img id="mainImg" src="products(img)/Gemini_Generated_Image_v47amgv47amgv47a.png" alt="">
+      </div>
+
+    </div>
+
+    <!-- RIGHT SIDE -->
+    <div class="right-side">
+
+      <h1>Women's High-Rise Slim Fit Jeans</h1>
+<p class="subtitle">Mid Blue • Stretch Denim</p>
+<div class="rating">⭐⭐⭐⭐⭐ <span style="color:#666">4.8 • 3,412 reviews</span></div>
+<p class="price">₹1,599 <span class="old">₹2,999</span> <span style="color:green">47% OFF</span></p>
+
+      <!-- SIZE SELECTION -->
+      <div class="sizes">
+        <span onclick="selectSize(this)">S</span>
+        <span onclick="selectSize(this)">M</span>
+        <span onclick="selectSize(this)">L</span>
+        <span onclick="selectSize(this)">XL</span>
+      </div>
+
+      <!-- BUTTONS -->
+      <button class="btn add-btn" id="addToCartBtn">ADD TO CART</button>
+      <button class="btn wish"><i class="fa-regular fa-heart"></i> ADD TO WISHLIST</button>
+
+      <!-- PINCODE -->
+      <div class="pinbox">
+        <h4>Check Delivery</h4>
+        <input id="pincode" type="number" placeholder="Enter Pincode">
+        <button onclick="checkPincode()">Check</button>
+        <p id="pincodeResult">✔ Delivery available</p>
+      </div>
+
+      <!-- DETAILS -->
+      <div style="margin-top:20px">
+        <h4>Product Details</h4>
+        <ul style="margin-top:8px;color:#444;line-height:1.8">
+          <li>Fit: Slim Tapered</li>
+          <li>Fabric: 98% Cotton, 2% Elastane</li>
+          <li>Made in India</li>
+        </ul>
+      </div>
+
+    </div>
+  </section>
+</div>
+
+<!-- CART DRAWER -->
+<div class="cart-overlay" id="cartOverlay" onclick="closeDrawer()"></div>
+
+<aside class="cart-drawer" id="cartDrawer">
+  <div class="drawer-header">
+    <h3>Your Cart</h3>
+    <button class="close-drawer" onclick="closeDrawer()"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+
+  <div class="drawer-items" id="drawerItems"></div>
+
+  <div class="drawer-footer">
+    <div class="drawer-summary">
+      <span>Subtotal</span>
+      <span>₹<span id="drawerSubtotal">0</span></span>
+    </div>
+
+    <div class="drawer-cta">
+      <a href="cart.html">
+        <button class="checkout-min" onclick="goToCart()">View Cart</button>
+        <button class="go-cart" onclick="checkoutNow()">Checkout</button>
+      </a>
+    </div>
+  </div>
+</aside>
+
+<div id="toast" class="toast">Added to cart ✔</div>
+
+
+<script>
+/* ---------------- PINCODE CHECKER ---------------- */
+function checkPincode(){
+  let pin = document.getElementById("pincode").value;
+  let res = document.getElementById("pincodeResult");
+
+  if(pin.length !== 6 || isNaN(pin)){
+    alert("Please enter a valid 6-digit pincode!");
+    res.style.display="none";
+    return;
+  }
+
+  res.innerText = "✔ Delivery available for pincode " + pin;
+  res.style.display="block";
+}
+
+/* ---------------- SIZE SELECTOR ---------------- */
+function selectSize(el) {
+  document.querySelectorAll(".sizes span")
+    .forEach(s => s.classList.remove("active-size"));
+  el.classList.add("active-size");
+}
+
+function getSelectedSize() {
+  const sizes = document.querySelectorAll(".sizes span");
+  let selected = null;
+
+  sizes.forEach(s => {
+    if (s.classList.contains("active-size")) selected = s.innerText;
+  });
+
+  return selected;
+}
+
+/* ---------------- CART FUNCTIONS ---------------- */
+function getCart(){ return JSON.parse(localStorage.getItem('cart')||'[]') }
+
+const overlay = document.getElementById('cartOverlay');
+const drawer = document.getElementById('cartDrawer');
+
+function openDrawer(){
+  overlay.classList.add('show');
+  drawer.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  renderDrawer();
+}
+function closeDrawer(){
+  overlay.classList.remove('show');
+  drawer.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function renderDrawer(){
+  const wrap = document.getElementById('drawerItems');
+  const cart = getCart();
+  wrap.innerHTML = '';
+  let subtotal = 0;
+
+  if(cart.length === 0){
+    wrap.innerHTML = '<p style="color:#666;padding:30px;text-align:center">Your cart is empty.</p>';
+  } 
+  else {
+    cart.forEach((it, idx) => {
+      subtotal += it.price * (it.qty||1);
+      wrap.innerHTML += `
+        <div class="drawer-item">
+          <img src="${it.image}">
+          <div class="meta">
+            <div class="title">${it.name}</div>
+            <div class="price">₹${it.price}</div>
+          </div>
+          <div class="qty-controls">
+            <button class="qbtn" onclick="updateQty(${idx}, -1)">-</button>
+            <div style="font-weight:700">${it.qty||1}</div>
+            <button class="qbtn" onclick="updateQty(${idx}, 1)">+</button>
+            <div style="font-size:12px;color:#c33;cursor:pointer;margin-top:6px" onclick="removeItem(${idx})">Remove</div>
+          </div>
+        </div>`;
+    });
+  }
+
+  document.getElementById('drawerSubtotal').innerText = subtotal;
+}
+
+function updateQty(i, delta){
+  const cart = getCart();
+  if(!cart[i]) return;
+
+  cart[i].qty = (cart[i].qty||1) + delta;
+  if(cart[i].qty <= 0) cart.splice(i,1);
+
+  localStorage.setItem('cart', JSON.stringify(cart));
+  renderDrawer();
+  showToast('Updated cart');
+}
+
+function removeItem(i){
+  const cart = getCart();
+  cart.splice(i,1);
+  localStorage.setItem('cart', JSON.stringify(cart));
+  renderDrawer();
+  showToast('Removed');
+}
+
+/* ---------------- ADD TO CART (SIZE REQUIRED) ---------------- */
+document.getElementById('addToCartBtn').addEventListener('click', () => {
+
+  const chosenSize = getSelectedSize();
+
+  if (!chosenSize) {
+    alert("Please select a size before adding to cart!");
+    return;
+  }
+
+  const item = {
+    id: 'jeans-512-' + chosenSize,
+    name: "Men’s 512™ Slim Tapered Jeans (" + chosenSize + ")",
+    size: chosenSize,
+    price: 2999,
+    image: document.getElementById('mainImg').src,
+    qty: 1
+  };
+
+  const cart = getCart();
+  const found = cart.find(i => i.id === item.id);
+
+  if(found) found.qty++;
+  else cart.push(item);
+
+  localStorage.setItem('cart', JSON.stringify(cart));
+
+  document.getElementById('mainImg')
+    .animate([{transform:'scale(1)'},{transform:'scale(.95)'},{transform:'scale(1)'}],
+             {duration:380,easing:'ease'});
+
+  showToast("Added size " + chosenSize + " ✔");
+  setTimeout(() => openDrawer(), 300);
+});
+
+/* ---------------- TOAST ---------------- */
+const toastEl = document.getElementById('toast');
+
+function showToast(msg){
+  toastEl.textContent = msg;
+  toastEl.classList.add('show');
+  setTimeout(()=> toastEl.classList.remove('show'), 1400);
+}
+
+/* ---------------- IMAGE SWITCH ---------------- */
+function changeImg(src){
+  document.getElementById('mainImg').src = src;
+}
+</script>
+
+</body>
+</html>

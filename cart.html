@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Cart & Checkout – Stylemate (Premium)</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"Poppins",sans-serif;background:linear-gradient(180deg,#f7f5f2,#efe6db);color:#111;min-height:100vh;padding:28px}
+
+  .container{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 420px;gap:28px;align-items:start}
+
+  /* glass card */
+  .card{
+    background:linear-gradient(180deg, rgba(255,255,255,0.75), rgba(255,255,255,0.66));
+    border-radius:18px;padding:20px;border:1px solid rgba(255,255,255,.6);backdrop-filter:blur(8px);box-shadow:0 18px 40px rgba(0,0,0,.06)
+  }
+
+  /* progress bar */
+  .progress-wrap{margin-bottom:18px}
+  .steps{display:flex;gap:10px;align-items:center}
+  .step{
+    flex:1;padding:10px;border-radius:12px;background:rgba(0,0,0,0.06);text-align:center;font-weight:700;color:#444;position:relative
+  }
+  .step.active{background:linear-gradient(90deg,#111,#333);color:#fff;box-shadow:0 8px 20px rgba(0,0,0,.12)}
+  .progress-line{height:6px;background:rgba(0,0,0,.06);border-radius:6px;margin-top:12px;overflow:hidden}
+  .progress-line > i{display:block;height:100%;width:0%;background:linear-gradient(90deg,#111,#333);border-radius:6px;transition:width .5s ease}
+
+  /* cart list */
+  .cart-list{display:flex;flex-direction:column;gap:12px}
+  .cart-item{display:flex;gap:14px;align-items:center;padding:12px;border-radius:12px;background:rgba(255,255,255,.85);border:1px solid rgba(0,0,0,.04)}
+  .cart-item img{width:110px;height:130px;object-fit:cover;border-radius:10px}
+  .item-meta{flex:1}
+  .item-meta .title{font-size:16px;font-weight:700}
+  .item-meta .price{margin-top:6px;font-weight:700;color:#111}
+  .item-actions{display:flex;flex-direction:column;gap:8px;align-items:flex-end}
+  .qty-controls{display:flex;gap:8px;align-items:center}
+  .qty-controls button{background:#111;color:#fff;border:0;padding:6px 10px;border-radius:8px;cursor:pointer}
+
+  /* price card */
+  .price-card{display:flex;flex-direction:column;gap:10px}
+  .price-row{display:flex;justify-content:space-between;align-items:center}
+  .checkout-btn{background:#111;color:#fff;border:0;padding:14px;border-radius:12px;font-weight:800;cursor:pointer;margin-top:8px}
+
+  /* steps content */
+  .step-content{margin-top:18px;display:none}
+  .step-content.active{display:block}
+  .form-input{width:100%;padding:12px;border-radius:10px;border:1px solid #ddd;margin-bottom:8px}
+
+  /* success animation */
+  .success {
+    display:none;
+    text-align:center;padding:44px;border-radius:14px;background:linear-gradient(180deg,#fff,#fafafa);
+  }
+  .success.show{display:block}
+  .checkmark {
+    width:120px;height:120px;margin:0 auto 16px;position:relative;
+  }
+  .checkmark svg{width:100%;height:100%}
+  .circle{stroke:#e6e6e6;stroke-width:8;fill:none}
+  .tick{stroke:#12a054;stroke-width:8;stroke-linecap:round;stroke-linejoin:round;fill:none;stroke-dasharray:1000;stroke-dashoffset:1000;animation:drawTick .9s ease forwards .5s}
+  @keyframes drawTick{to{stroke-dashoffset:0}}
+
+  /* mobile */
+  @media(max-width:980px){
+    .container{grid-template-columns:1fr; padding:12px}
+    .price-card{position:sticky;bottom:12px}
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <!-- LEFT: CART & STEPS -->
+  <div>
+    <div class="card">
+      <div class="progress-wrap">
+        <div class="steps">
+          <div class="step active" id="pship">Shipping</div>
+          <div class="step" id="pdel">Delivery</div>
+          <div class="step" id="ppay">Payment</div>
+          <div class="step" id="pdone">Confirm</div>
+        </div>
+        <div class="progress-line"><i id="progressBar"></i></div>
+      </div>
+
+      <!-- cart items -->
+      <div class="cart-list card" id="cartList"></div>
+
+      <!-- step content -->
+      <div id="content1" class="step-content active">
+        <h3>Shipping Details</h3>
+        <input class="form-input" id="shipName" placeholder="Full name">
+        <input class="form-input" id="shipAddr" placeholder="Address, City, Pincode">
+        <button class="checkout-btn" onclick="nextStep(1)">Next → Delivery</button>
+      </div>
+
+      <div id="content2" class="step-content">
+        <h3>Delivery Method</h3>
+        <select id="deliveryMethod" class="form-input">
+          <option value="standard" data-price="50">Standard – ₹50</option>
+          <option value="express" data-price="99">Express – ₹99</option>
+        </select>
+        <button class="checkout-btn" onclick="nextStep(2)">Next → Payment</button>
+      </div>
+
+      <div id="content3" class="step-content">
+        <h3>Payment</h3>
+        <select id="paymentMethod" class="form-input">
+          <option>Cash on Delivery</option>
+          <option>UPI</option>
+          <option>Card</option>
+        </select>
+        <button class="checkout-btn" onclick="nextStep(3)">Confirm Order</button>
+      </div>
+
+      <div id="content4" class="step-content">
+        <div class="success" id="successBox">
+          <div class="checkmark">
+            <svg viewBox="0 0 120 120">
+              <circle class="circle" cx="60" cy="60" r="50"></circle>
+              <path class="tick" d="M36 62 L52 78 L86 44"></path>
+            </svg>
+          </div>
+          <h2>Order Confirmed 🎉</h2>
+          <p id="orderSummary" style="color:#666;margin-top:8px"></p>
+          <button class="checkout-btn" onclick="finish()">Back to Home</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: PRICE SUMMARY -->
+  <aside>
+    <div class="card price-card">
+      <h3>Order Summary</h3>
+      <div class="price-row"><div>Subtotal</div><div>₹<span id="subVal">0</span></div></div>
+      <div class="price-row"><div>Shipping</div><div>₹<span id="shipVal">50</span></div></div>
+      <hr style="margin-top:12px;border:none;border-top:1px solid rgba(0,0,0,.06)">
+      <div class="price-row" style="font-weight:800;font-size:20px"><div>Total</div><div>₹<span id="totVal">0</span></div></div>
+        <div style="margin-top:12px">
+            <input id="couponInput" placeholder="Enter coupon code"
+                style="width:100%;padding:10px;border-radius:10px;border:1px solid #ccc;margin-bottom:6px">
+            <button class="checkout-btn" style="background:#333" onclick="applyCoupon()">Apply Coupon</button>
+            <p id="couponMsg" style="margin-top:6px;font-size:14px;color:#12a054;display:none"></p>
+        </div>
+
+<div class="price-row">
+  <div>GST (18%)</div>
+  <div>₹<span id="taxVal">0</span></div>
+</div>
+
+      <button class="checkout-btn">Continue Checkout</button>
+    </div>
+  </aside>
+</div>
+
+<script>
+
+let appliedCoupon = null;
+
+/* ------------------ CART HELPERS ------------------ */
+function getCart(){ 
+  return JSON.parse(localStorage.getItem('cart')||'[]'); 
+}
+function setCart(c){ 
+  localStorage.setItem('cart', JSON.stringify(c)); 
+}
+
+/* ------------------ SUMMARY UPDATE ------------------ */
+function updateSummary() {
+  const cart = getCart();
+  let sub = 0;
+
+  cart.forEach(it => {
+    sub += it.price * (it.qty || 1);
+  });
+
+  // detect shipping
+  let ship = 50;
+  const delivery = document.getElementById('deliveryMethod');
+  if (delivery) {
+    const opt = delivery.options[delivery.selectedIndex];
+    ship = parseInt(opt.dataset.price);
+  }
+
+  // GST 18%
+  let tax = Math.round(sub * 0.18);
+
+  // Coupon discount
+  let discount = 0;
+  if (appliedCoupon === "STYLE100") discount = 100;
+  if (appliedCoupon === "STYLE10") discount = Math.round(sub * 0.10);
+  if (appliedCoupon === "FASHION50") discount = 50;
+  if (appliedCoupon === "BABE20") discount = Math.round(sub * 0.20);
+
+  if (discount > sub) discount = sub;
+
+  let finalTotal = sub + ship + tax - discount;
+
+  // Update UI
+  document.getElementById('subVal').innerText = sub;
+  document.getElementById('shipVal').innerText = ship;
+  document.getElementById('taxVal').innerText = tax;
+  document.getElementById('totVal').innerText = finalTotal;
+
+  return { sub, ship, tax, discount, total: finalTotal };
+}
+
+/* ------------------ APPLY COUPON ------------------ */
+function applyCoupon() {
+  const code = document.getElementById("couponInput").value.trim().toUpperCase();
+  const msg = document.getElementById("couponMsg");
+
+  const valid = ["STYLE100", "STYLE10", "FASHION50", "BABE20"];
+
+  if (!valid.includes(code)) {
+    msg.innerText = "Invalid coupon 😔";
+    msg.style.color = "#c33";
+    msg.style.display = "block";
+    appliedCoupon = null;
+    updateSummary();
+    return;
+  }
+
+  appliedCoupon = code;
+  msg.style.color = "#12a054";
+
+  if (code === "STYLE100") msg.innerText = "₹100 OFF applied 🎉";
+  if (code === "STYLE10") msg.innerText = "10% OFF applied 🎉";
+  if (code === "FASHION50") msg.innerText = "₹50 OFF applied 🎉";
+  if (code === "BABE20") msg.innerText = "20% OFF (Special for you ❤️)";
+
+  msg.style.display = "block";
+  updateSummary();
+}
+
+/* ------------------ RENDER CART ITEMS ------------------ */
+function renderCart(){
+  const wrap = document.getElementById('cartList');
+  const cart = getCart();
+  wrap.innerHTML = '';
+
+  if(cart.length===0){
+    wrap.innerHTML = '<div style="padding:18px;text-align:center;color:#666">Your cart is empty.</div>';
+  } else {
+    cart.forEach((it, idx) => {
+      wrap.innerHTML += `
+        <div class="cart-item">
+          <img src="${it.image}" alt="">
+          <div class="item-meta">
+            <div class="title">${it.name}</div>
+            <div class="price">₹${it.price}</div>
+          </div>
+          <div class="item-actions">
+            <div class="qty-controls">
+              <button onclick="changeQty(${idx}, -1)">-</button>
+              <div style="font-weight:700">${it.qty || 1}</div>
+              <button onclick="changeQty(${idx}, 1)">+</button>
+            </div>
+            <div style="margin-top:8px;color:#c33;cursor:pointer" onclick="removeItem(${idx})">Remove</div>
+          </div>
+        </div>
+      `;
+    });
+  }
+
+  updateSummary();
+}
+
+/* ------------------ CHANGE QTY & REMOVE ------------------ */
+function changeQty(i, delta){
+  const cart = getCart();
+  if(cart[i]){
+    cart[i].qty = (cart[i].qty||1) + delta;
+    if(cart[i].qty <= 0) cart.splice(i,1);
+    setCart(cart);
+    renderCart();
+  }
+}
+
+function removeItem(i){
+  const cart = getCart();
+  if(cart[i]){
+    cart.splice(i,1);
+    setCart(cart);
+    renderCart();
+  }
+}
+
+/* ------------------ CHECKOUT STEPS ------------------ */
+let currentStep = 1;
+
+function nextStep(step){
+  if(step === 1){
+    const name = document.getElementById('shipName').value.trim();
+    const addr = document.getElementById('shipAddr').value.trim();
+    if(!name || !addr){ 
+      alert("Please fill name & address"); 
+      return; 
+    }
+  }
+
+  if(step === 2){
+    updateSummary();
+  }
+
+  if(step === 3){
+    const totals = updateSummary();
+
+    document.getElementById('orderSummary').innerText =
+      `Order Amount: ₹${totals.total}\nDelivered to: ${document.getElementById('shipAddr').value}`;
+
+    localStorage.removeItem("cart");
+    renderCart();
+
+    activateStep(4);
+    document.getElementById("successBox").classList.add("show");
+    return;
+  }
+
+  activateStep(step+1);
+}
+
+function activateStep(step){
+  currentStep = step;
+
+  document.querySelectorAll('.step').forEach((el,i)=>{
+    if(i < step) el.classList.add('active');
+    else el.classList.remove('active');
+  });
+
+  document.getElementById('progressBar').style.width = (step * 25) + '%';
+
+  document.querySelectorAll('.step-content').forEach((el,i)=>{
+    el.classList.remove('active');
+    if(i === step-1) el.classList.add('active');
+  });
+}
+
+/* ------------------ FINISH ------------------ */
+function finish(){ 
+  location.href = "homepage.html"; 
+}
+
+/* ------------------ INIT ------------------ */
+document.addEventListener('DOMContentLoaded', () => {
+  renderCart();
+
+  const dl = document.getElementById('deliveryMethod');
+  if(dl){
+    dl.addEventListener('change', updateSummary);
+  }
+});
+
+</script>
+</body>
+</html>
