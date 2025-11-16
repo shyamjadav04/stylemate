@@ -186,4 +186,23 @@ canvas.sheryjs-canvas {
     color: #000000;
     letter-spacing: 5px;
 }
+.btn-link {
+    display: inline-block;
+    padding: 14px 28px;
+    background: black;
+    color: white;
+    font-size: 18px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 600;
+    position: relative;
+    z-index: 9999;
+    pointer-events: auto;
+}
+
+canvas {
+    pointer-events: none !important;
+}
+
+
  
